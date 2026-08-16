@@ -1,0 +1,11 @@
+__pycache__/
+*.pyc
+.venv/
+venv/
+*.egg-info/
+models/
+scorer_results/
+reports/figures/
+.ipynb_checkpoints/
+validation_predictions.csv
+december_predictions.csv
