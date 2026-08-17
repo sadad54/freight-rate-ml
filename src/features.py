@@ -14,8 +14,8 @@ import pandas as pd
 
 CATEGORICAL_FEATURES = ["pickup", "delivery", "equipment"]
 NUMERIC_FEATURES = [
-    "distance", "weight", "pickup_lat", "pickup_lon", 
-    "delivery_lat", "delivery_lon", "market_index", "quote_signal", "day_of_week", "day_of_year", "month", "is_weekend",
+    "distance", "weight", "pickup_lat", "pickup_lon",
+    "delivery_lat", "delivery_lon", "market_index", "quote_signal", "day_of_week", "day_of_month", "day_of_year", "month", "is_weekend",
     "days_since_start",
 ]
 
