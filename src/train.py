@@ -49,10 +49,13 @@ def main() -> None:
     train_raw, valid_raw = time_based_split(raw)
     X_train = build_features(train_raw, city_coords)
     y_train = train_raw["posted_rate"]
-    X_valid = build_features(train_raw, city_coords)
+    X_valid = build_features(valid_raw, city_coords)
     y_valid = valid_raw["posted_rate"]
 
-    baseline =  _make_baseline().fit(X_train, y_train)
+    baseline = _make_baseline().fit(X_train, y_train)
+    print("Baseline (linear, one-hot city):", summarize(y_valid.to_numpy(), baseline.predict(X_valid)))
+
+    main_model = _make_main_model().fit(X_train, y_train)
     print("HistGradientBoostingRegressor:", summarize(y_valid.to_numpy(), main_model.predict(X_valid)))
 
     #REFIT on ALL labeled data once architecture/hyperparameters are
