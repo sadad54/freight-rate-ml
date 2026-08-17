@@ -9,23 +9,30 @@ from pathlib import Path
 import joblib
 from sklearn.compose import ColumnTransformer
 from sklearn.ensemble import HistGradientBoostingRegressor
+from sklearn.impute import SimpleImputer
 from sklearn.linear_model import LinearRegression
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import OneHotEncoder
 
 from src.data import load_train_test
 from src.evaluate import summarize
-from src.features import CATEGORICAL_FEATURES, build_city_coords, build_features
+from src.features import CATEGORICAL_FEATURES, NUMERIC_FEATURES, build_city_coords, build_features
 from src.split import time_based_split
 
 DATA_PATH = Path("data/train-test.csv")
 MODEL_DIR = Path("models")
 
 def _make_baseline()-> Pipeline:
-    """Simple linear baseline -- gives an honest floot to beat."""
+    """Simple linear baseline -- gives an honest floor to beat.
+
+    Unlike HistGradientBoostingRegressor, LinearRegression can't
+    handle NaN, so numeric columns get median-imputed here only
+    (the main model still sees the raw NaNs)."""
     preprocess = ColumnTransformer(
-        transformers=[("cat", OneHotEncoder(handle_unknown="ignore"),CATEGORICAL_FEATURES)],
-        remainder="passthrough",
+        transformers=[
+            ("cat", OneHotEncoder(handle_unknown="ignore"), CATEGORICAL_FEATURES),
+            ("num", SimpleImputer(strategy="median"), NUMERIC_FEATURES),
+        ],
     )
     return Pipeline([("prep", preprocess), ("model", LinearRegression())])
 
@@ -69,5 +76,6 @@ def main() -> None:
     city_coords.to_csv(MODEL_DIR / "city_coords.csv")
     print(f"Saved model to {MODEL_DIR/'model.joblib'}")
 
-    if __name__ == "__main__":
-        main()
+
+if __name__ == "__main__":
+    main()
