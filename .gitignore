@@ -6,6 +6,8 @@ venv/
 models/
 scorer_results/
 reports/figures/
+reports/*.docx
+reports/*.pdf
 .ipynb_checkpoints/
 validation_predictions.csv
 december_predictions.csv
