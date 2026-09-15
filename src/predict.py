@@ -9,6 +9,7 @@ from pathlib import Path
 
 import joblib
 import pandas as pd
+import numpy as np
 
 from src.data import load_december_inputs, load_validation
 from src.features import build_features
@@ -23,6 +24,22 @@ def _load_model_and_coords():
     return model, city_coords
 
 
+def align_predictions(template, source, predictions):
+    """Validate identifiers and preserve the exact template ordering."""
+    for frame in (template, source):
+        if frame["load_id"].isna().any() or frame["load_id"].duplicated().any():
+            raise ValueError("load_id must be non-null and unique")
+    if set(template["load_id"]) != set(source["load_id"]):
+        raise ValueError("prediction IDs must match the complete template")
+    values = np.asarray(predictions, dtype=float)
+    if values.shape != (len(source),) or not np.isfinite(values).all():
+        raise ValueError("one finite prediction is required for each source row")
+    return template[["load_id"]].merge(
+        pd.DataFrame({"load_id": source["load_id"], "predicted_rate": values}),
+        on="load_id", how="left", sort=False, validate="one_to_one",
+    )
+
+
 def predict_validation() -> None:
     model, city_coords = _load_model_and_coords()
     val = load_validation(DATA_DIR / "validation.csv")
@@ -30,10 +47,7 @@ def predict_validation() -> None:
     preds = model.predict(X)
 
     template = pd.read_csv(DATA_DIR / "validation-predictions-template.csv")
-    out = template[["load_id"]].merge(
-        pd.DataFrame({"load_id": val["load_id"], "predicted_rate": preds}),
-        on="load_id", how="left",
-    )
+    out = align_predictions(template, val, preds)
     out.to_csv("validation_predictions.csv", index=False)
     print(f"Wrote validation predictions.csv ({len(out)} rows)")
 
@@ -43,6 +57,8 @@ def predict_december()-> None:
     X = build_features(dec, city_coords)
     preds = model.predict(X)
 
+    if len(preds) != len(dec) or not np.isfinite(preds).all():
+        raise ValueError("December predictions must be finite and row-aligned")
     out=dec.copy()
     out["date"] = out["date"].dt.strftime("%Y-%m-%d")
     out["predicted_rate"]= preds

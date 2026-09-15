@@ -1,0 +1,63 @@
+{
+  "scope": "Internal temporal holdout; not external validation.csv target accuracy",
+  "data_sha256": "892980fd20bac7ac0ca4ec31d3981fca48d52dec88e4f02642ab955f1efb40fe",
+  "python": "3.12.14",
+  "scikit_learn": "1.8.0",
+  "train_rows": 38477,
+  "holdout_rows": 9523,
+  "train_dates": [
+    "2025-01-01",
+    "2025-08-31"
+  ],
+  "holdout_dates": [
+    "2025-09-01",
+    "2025-10-31"
+  ],
+  "features": [
+    "pickup",
+    "delivery",
+    "equipment",
+    "distance",
+    "weight",
+    "pickup_lat",
+    "pickup_lon",
+    "delivery_lat",
+    "delivery_lon",
+    "market_index",
+    "quote_signal",
+    "day_of_week",
+    "day_of_month",
+    "day_of_year",
+    "month",
+    "is_weekend",
+    "days_since_start"
+  ],
+  "preprocessing": "City lookup fitted on training partition only; final refit uses all labelled data",
+  "seed": 42,
+  "results": {
+    "full_features": {
+      "linear_baseline": {
+        "MAE": 142.7629909093117,
+        "RMSE": 637.5262202409297,
+        "MAPE_%": 8.284749843621023
+      },
+      "hist_gradient_boosting": {
+        "MAE": 143.92208170528474,
+        "RMSE": 641.4704396432994,
+        "MAPE_%": 6.892703020794881
+      }
+    },
+    "december_feature_schema": {
+      "linear_baseline": {
+        "MAE": 164.32917329957797,
+        "RMSE": 639.3525581021631,
+        "MAPE_%": 10.028398059404495
+      },
+      "hist_gradient_boosting": {
+        "MAE": 154.2063517212873,
+        "RMSE": 644.1987068898311,
+        "MAPE_%": 7.497737667157896
+      }
+    }
+  }
+}
